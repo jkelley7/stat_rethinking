@@ -38,14 +38,42 @@ with pm.Model() as m51:
 varnames = ['alpha', 'beta','sigma']
 pm.summary(trace51, varnames = varnames)
 
+#%% [markdown]
+# ## Code 5.2
 #%%
 new_x_values = np.linspace(-3,3.5,num = 30)
 shared_x.set_value(new_x_values)
 shared_y.set_value(np.repeat(0, repeats = len(new_x_values)))
+with m51:
+    post_pred = pm.sample_posterior_predictive(trace51,samples = 1000,model=m51)
 
 #%%
-with m51:
-    post_pred = pm.sample_posterior_predictive(trace51,samples = 400,model=m51)
+def plot_fill_between(x_vals, y_vals, alpha_mean, beta_mean, mu_hpd, pred_hpd, xlabel, ylabel, title, figsize = (10,8)):
+    sorted_x_vals = np.sort(x_vals, axis = 0)
+    mu_pred_sort = -np.sort(-mu_hpd, axis = 0)
+
+    plt.figure(figsize=figsize)
+    plt.plot(x_vals,y_vals, color = 'orange', marker = '.', linestyle = '')
+    plt.plot(sorted_x_vals, np.mean(alpha_mean) + np.mean(beta_mean)*sorted_x_vals, color = 'white', alpha = 1)
+    plt.fill_between(sorted_x_vals, mu_pred_sort[:,0], mu_pred_sort[:,1], color='white', alpha=0.3)
+    plt.fill_between(sorted_x_vals,pred_hpd[:,0], pred_hpd[:,1], color = 'grey' )
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title, fontsize = 18)
+    
+    return plt.show()
+
+#%%
+mu_hpd = az.hpd(trace51['mu'], credible_interval=.89)
+post_pred_hpd = az.hpd(post_pred['divorce'], credible_interval=.89)
+post_pred_hpd = -np.sort(-post_pred_hpd, axis = 0)
+
+
+#%%
+plot_fill_between(d.medianagemarriage_s.values, 
+                d.divorce.values, trace51['alpha'], trace51['beta'], mu_hpd, post_pred_hpd,'median_age','divorce rate','yeah' )
+
+#%%
 
 
 #%%
