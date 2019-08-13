@@ -25,23 +25,9 @@ def sort_vals(vals, ascending = True):
         idx = np.argsort(vals)
     return idx
 
-def plot_fill_between(x_vals, y_vals, alpha_mean, beta_mean, mu_hpd, pred_hpd, xlabel, ylabel, title, figsize = (10,8)):
-    sorted_x_vals = np.sort(x_vals, axis = 0)
-    mu_pred_sort = -np.sort(-mu_hpd, axis = 0)
-
-    plt.figure(figsize=figsize)
-    plt.plot(x_vals,y_vals, color = 'orange', marker = '.', linestyle = '')
-    plt.plot(sorted_x_vals, np.mean(alpha_mean) + np.mean(beta_mean)*sorted_x_vals, color = 'white', alpha = 1)
-    plt.fill_between(sorted_x_vals, mu_pred_sort[:,0], mu_pred_sort[:,1], color='white', alpha=0.3)
-    plt.fill_between(sorted_x_vals,pred_hpd[:,0], pred_hpd[:,1], color = 'grey' )
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.title(title, fontsize = 18)
-    
-    return plt.show()
-
 #%% [markdown]
 # # Chapter 5
+# ### COde 5.1
 
 #%%
 d = pd.read_csv('.\data\WaffleDivorce.csv', sep = ';')
@@ -51,8 +37,6 @@ d.head()
 #%%
 d['medianagemarriage_s'] = (d.medianagemarriage - d.medianagemarriage.mean())/ d.medianagemarriage.std()
 
-#%% [markdown]
-# ## Code 5.1
 #%%
 shared_x = tt.shared(d.medianagemarriage_s.values)
 shared_y = tt.shared(d.divorce.values)
@@ -190,7 +174,7 @@ with pm.Model() as m56:
 
 #%%
 varnames_56 = ['alpha', 'MAM_beta','sigma']
-pm.summary(trace56, varnames = varnames)
+pm.summary(trace56, varnames = varnames_56)
 
 #%% [markdown]
 # ## Code 5.7
@@ -198,13 +182,20 @@ pm.summary(trace56, varnames = varnames)
 # computer expected value at MAP, for each State
 mu = trace56['alpha'].mean() + trace56['MAM_beta'].mean()*d.medianagemarriage_s
 # compute residual for each state
-m_resid = d.medianagemarriage_s - mu
+d['m_resid'] = d.medianagemarriage_s - mu
 
+#%% [markdown]
+# ## Code 5.8
 #%%
 idx = np.argsort(d.medianagemarriage_s)
 plt.plot('medianagemarriage_s', 'marriage_s', data = d, marker = '.', linestyle = '')
 plt.plot(d.loc[idx,'medianagemarriage_s'], mu[idx], linestyle = '-',color = 'black')
 
+
+#%%
+sns.lmplot('m_resid','divorce',data=d)
+
+#%%
 
 
 #%%
