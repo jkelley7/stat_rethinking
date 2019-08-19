@@ -2,4 +2,4 @@
 
 # Working thru the book Stat Rethinking by Richard McElreath
 
-My goal is to take what I'm learning here and apply it at work and at home on personal projects
+Chapters include both code examples in the book and solutions to practice/homework problems
