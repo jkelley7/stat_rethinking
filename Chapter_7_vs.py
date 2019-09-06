@@ -104,3 +104,22 @@ plt.plot(rugged_seq, mu_noAf.mean(1), color = 'black')
 plt.fill_between(rugged_seq, hpd_noaf[:,0], hpd_noaf[:,1], alpha = .2, color = 'black')
 plt.xlabel('Terrain Ruggedness Index')
 plt.ylabel('log GDP')
+
+# 7.7
+with pm.Model() as m7_5:
+    alpha = pm.Normal('alpha', mu = 8, sigma = 100)
+    betaR = pm.Normal('betaR', sigma = 1)
+    betaA = pm.Normal('betaA', sigma = 1)
+    betaAR = pm.Normal('betaAR', sigma = 1)
+    sigma = pm.Uniform('sigma', upper = 10)
+    gamma = betaR + betaAR*dd.cont_africa.values
+    mu = alpha + gamma + betaA*dd.cont_africa.values
+    log_gdp = pm.Normal('log_gdp',mu=mu, sigma = sigma, observed = dd.log_gdp.values)
+    tracem75 = pm.sample(draws=1000, tune = 1000)
+
+pm.summary(tracem75)
+
+# 7.8
+m7_5.name = 'm75'
+comp = pm.compare({m7_3:tracem73, m7_4:tracem74, m7_5: tracem75})
+pm.compareplot(comp)
