@@ -113,7 +113,7 @@ with pm.Model() as m7_5:
     betaAR = pm.Normal('betaAR', sigma = 1)
     sigma = pm.Uniform('sigma', upper = 10)
     gamma = betaR + betaAR*dd.cont_africa.values
-    mu = alpha + gamma + betaA*dd.cont_africa.values
+    mu = alpha + gamma*dd.rugged.values + betaA*dd.cont_africa.values
     log_gdp = pm.Normal('log_gdp',mu=mu, sigma = sigma, observed = dd.log_gdp.values)
     tracem75 = pm.sample(draws=1000, tune = 1000)
 
@@ -143,3 +143,27 @@ plt.figure(figsize=(10,8))
 pm.compareplot(comp_)
 
 # 7.10
+rugged_seq = np.arange(-1,8,.25)
+mu_Af = np.zeros((len(rugged_seq),tracem75['alpha'].shape[0]))
+mu_noAf = np.zeros((len(rugged_seq),tracem75['alpha'].shape[0]))
+
+for row, seq in enumerate(rugged_seq):
+    mu_Af[row,:] = tracem75['alpha'] + (tracem75['betaR'] + tracem75['betaAR']*1)*rugged_seq[row]  +  tracem75['betaA']*1
+    mu_noAf[row,:] = tracem75['alpha'] + (tracem75['betaR'] + tracem75['betaAR']*0)*rugged_seq[row]  +  tracem75['betaA']*0
+
+hpd_af = az.hpd(mu_Af.T,credible_interval=.97)
+hpd_noaf = az.hpd(mu_noAf.T,credible_interval=.97)
+
+# 7.11
+plt.plot(da1.rugged, da1.log_gdp, marker = 'o', linestyle = '', color = 'blue')
+plt.plot(rugged_seq, mu_Af.mean(1), color = 'blue')
+plt.fill_between(rugged_seq, hpd_af[:,0], hpd_af[:,1], alpha = .4)
+plt.xlabel('Terrain Ruggedness Index')
+plt.ylabel('log GDP')
+plt.show()
+plt.plot(da0.rugged, da0.log_gdp, marker = 'o', linestyle = '', color = 'black')
+plt.plot(rugged_seq, mu_noAf.mean(1), color = 'black')
+plt.fill_between(rugged_seq, hpd_noaf[:,0], hpd_noaf[:,1], alpha = .2, color = 'black')
+plt.xlabel('Terrain Ruggedness Index')
+plt.ylabel('log GDP')
+plt.show()
