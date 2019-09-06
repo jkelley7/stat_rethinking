@@ -169,6 +169,7 @@ plt.ylabel('log GDP')
 plt.show()
 
 # 7.12
-pm.summary(tracem75)
+pm.summary(tracem75).round(2)
+
 
 # 7.13
