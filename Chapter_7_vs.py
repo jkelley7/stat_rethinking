@@ -167,3 +167,8 @@ plt.fill_between(rugged_seq, hpd_noaf[:,0], hpd_noaf[:,1], alpha = .2, color = '
 plt.xlabel('Terrain Ruggedness Index')
 plt.ylabel('log GDP')
 plt.show()
+
+# 7.12
+pm.summary(tracem75)
+
+# 7.13
