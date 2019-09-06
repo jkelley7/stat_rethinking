@@ -171,5 +171,15 @@ plt.show()
 # 7.12
 pm.summary(tracem75).round(2)
 
-
 # 7.13
+gamma_Africa = tracem75['betaR'] + tracem75['betaAR'] * 1
+gamma_notAfrica = tracem75['betaR']
+
+# 7.14
+gamma_Africa.mean()
+gamma_notAfrica.mean()
+
+# 7.15
+sns.kdeplot(gamma_Africa, color = 'blue',label = 'Africa')
+sns.kdeplot(gamma_notAfrica, color = 'black', label = 'Not Africa')
+plt.legend()
