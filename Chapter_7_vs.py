@@ -52,9 +52,10 @@ def plot_poserterior_mean(trace_mu,x_val, y_val,credible_interval = .97):
     plt.ylabel('log gdp')
     return plt
 
-plt1 = plot_poserterior_mean(tracem71['mu1'], da1.rugged, da1.log_gdp)
-plt2 = plot_poserterior_mean(tracem72['mu2'], da0.rugged, da0.log_gdp)
-
+plot_poserterior_mean(tracem71['mu1'], da1.rugged, da1.log_gdp)
+plt.show()
+plot_poserterior_mean(tracem72['mu2'], da0.rugged, da0.log_gdp)
+plt.show()
 
 # 7.3
 with pm.Model() as m7_3:
@@ -82,4 +83,24 @@ m7_3.name = 'm73'
 m7_4.name = 'm74'
 pm.compare({m7_3:tracem73, m7_4:tracem74})
 
-# 7 .6
+# 7.6
+rugged_seq = np.arange(-1,8,.25)
+mu_Af = np.zeros((len(rugged_seq),tracem74['mu'].shape[0]))
+mu_noAf = np.zeros((len(rugged_seq),tracem74['mu'].shape[0]))
+
+for row, seq in enumerate(rugged_seq):
+    mu_Af[row,:] = tracem74['alpha'] + tracem74['beta']*rugged_seq[row] + tracem74['beta2']*1
+    mu_noAf[row,:] = tracem74['alpha'] + tracem74['beta']*rugged_seq[row] + tracem74['beta2']*0
+
+hpd_af = az.hpd(mu_Af.T,credible_interval=.97)
+hpd_noaf = az.hpd(mu_noAf.T,credible_interval=.97)
+
+
+plt.plot(da1.rugged, da1.log_gdp, marker = 'o', linestyle = '', color = 'blue')
+plt.plot(rugged_seq, mu_Af.mean(1), color = 'blue')
+plt.fill_between(rugged_seq, hpd_af[:,0], hpd_af[:,1], alpha = .4)
+plt.plot(da0.rugged, da0.log_gdp, marker = 'o', linestyle = '', color = 'black')
+plt.plot(rugged_seq, mu_noAf.mean(1), color = 'black')
+plt.fill_between(rugged_seq, hpd_noaf[:,0], hpd_noaf[:,1], alpha = .2, color = 'black')
+plt.xlabel('Terrain Ruggedness Index')
+plt.ylabel('log GDP')
