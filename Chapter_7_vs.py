@@ -122,4 +122,7 @@ pm.summary(tracem75)
 # 7.8
 m7_5.name = 'm75'
 comp = pm.compare({m7_3:tracem73, m7_4:tracem74, m7_5: tracem75})
+comp
 pm.compareplot(comp)
+
+# 7.9
