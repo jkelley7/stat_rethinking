@@ -183,3 +183,7 @@ gamma_notAfrica.mean()
 sns.kdeplot(gamma_Africa, color = 'blue',label = 'Africa')
 sns.kdeplot(gamma_notAfrica, color = 'black', label = 'Not Africa')
 plt.legend()
+
+# 7.16
+diff = gamma_Africa - gamma_notAfrica
+np.sum( diff < 0 ) /len(diff)
