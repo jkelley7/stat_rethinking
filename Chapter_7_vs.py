@@ -77,7 +77,9 @@ with pm.Model() as m7_4:
     log_gdp = pm.Normal('log_gdp',mu=mu, sigma = sigma, observed = dd.log_gdp.values)
     tracem74 = pm.sample(draws=1000, tune = 1000)
 
+# 7.5
 m7_3.name = 'm73'
 m7_4.name = 'm74'
-pm.compare([tracem73, tracem74], 
-            [m7_3, m7_4])
+pm.compare({m7_3:tracem73, m7_4:tracem74})
+
+# 7 .6
