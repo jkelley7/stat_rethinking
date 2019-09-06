@@ -126,3 +126,20 @@ comp
 pm.compareplot(comp)
 
 # 7.9
+with pm.Model() as m7_5b:
+    alpha = pm.Normal('alpha', mu = 8, sigma = 100)
+    betaR = pm.Normal('betaR', sigma = 1)
+    betaA = pm.Normal('betaA', sigma = 1)
+    betaAR = pm.Normal('betaAR', sigma = 1)
+    sigma = pm.Uniform('sigma', upper = 10)
+    mu = alpha + betaR*dd.rugged + betaAR*dd.rugged.values*dd.cont_africa.values + betaA*dd.cont_africa.values
+    log_gdp = pm.Normal('log_gdp',mu=mu, sigma = sigma, observed = dd.log_gdp.values)
+    tracem75b = pm.sample(draws=1000, tune = 1000)
+
+m7_5b.name = 'm75b'
+pm.summary(tracem75b)
+comp_ = pm.compare({m7_5:tracem75, m7_5b:tracem75b})
+plt.figure(figsize=(10,8))
+pm.compareplot(comp_)
+
+# 7.10
